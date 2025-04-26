@@ -55,6 +55,12 @@
 								<li class="menu-item"><a href="insurance.html">Insurance plans</a></li>
 								<li class="menu-item"><a href="resource.html">Resources</a></li>
 								<li class="menu-item"><a href="contact.html">Contact</a></li>
+								{% if user.is_authenticated %}
+									<li><a href="{% url 'logout' %}">Logout</a></li>
+								{% else %}
+									<li><a href="{% url 'login' %}">Login</a></li>
+									<li><a href="{% url 'register' %}">Register</a></li>
+								{% endif %}
 							</ul> <!-- .menu -->
 						</div> <!-- .main-navigation -->
 						
@@ -282,8 +288,6 @@
 										<li><a href="#">About us</a></li>
 										<li><a href="#">Infoline</a></li>
 										<li><a href="#">Team</a></li>
-										<li><a href="#">Join us</a></li>
-										<li><a href="#">Cooperation</a></li>
 									</ul>
 								</div>
 							</div>
