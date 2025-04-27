@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Food Info Finder</title>
+</head>
+<body>
+    <h1>Yemek Bilgisi Bul</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="food" placeholder="Yemek adını yaz" required>
+        <button type="submit">Göster</button>
+    </form>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if food_info %}
+        <h2>{{ food_info.name|title }} için Bilgiler:</h2>
+        <ul>
+            <li><strong>Kalori:</strong> {{ food_info.calories }} kcal</li>
+            <li><strong>Karbonhidrat:</strong> {{ food_info.carbohydrates }} g</li>
+            <li><strong>Yağ:</strong> {{ food_info.fats }} g</li>
+            <li><strong>Protein:</strong> {{ food_info.proteins }} g</li>
+            <li><strong>Lif:</strong> {{ food_info.fiber }} g</li>
+        </ul>
+    {% endif %}
+</body>
+</html>
