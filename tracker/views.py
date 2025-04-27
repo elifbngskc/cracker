@@ -53,4 +53,4 @@ def get_calories(request):
             else:
                 error = 'Error fetching from API.'
 
-    return render(request, 'food_form.html', {'food_info': food_info, 'error': error})
+    return render(request, 'tracker/food_form.html', {'food_info': food_info, 'error': error})
