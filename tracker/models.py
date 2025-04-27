@@ -41,7 +41,7 @@ class Profile(models.Model):
             'protein_g': round((total * 0.3) / 4),
             'carbs_g': round((total * 0.4) / 4),
             'fat_g': round((total * 0.3) / 9),
-            }from django.db import models
+            }
 
 class FoodItem(models.Model):
     name = models.CharField(max_length=255, unique=True)

@@ -1,9 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import ProfileForm
 from django.contrib.auth.decorators import login_required
-
 import requests
-from django.shortcuts import render
 from .models import FoodItem
 
 def home(request):
