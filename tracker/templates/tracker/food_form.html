@@ -1,17 +1,12 @@
 {% extends 'tracker/base.html' %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Food Info Finder</title>
-</head>
-<body>
-    <h1>Yemek Bilgisi Bul</h1>
+
+{% block content %}
+    <h1>Find Food Information</h1>
 
     <form method="post">
         {% csrf_token %}
-        <input type="text" name="food" placeholder="Yemek adını yaz" required>
-        <button type="submit">Göster</button>
+        <input type="text" name="food" placeholder="Enter food name" required>
+        <button type="submit">Search</button>
     </form>
 
     {% if error %}
@@ -19,14 +14,13 @@
     {% endif %}
 
     {% if food_info %}
-        <h2>{{ food_info.name|title }} için Bilgiler:</h2>
+        <h2>Nutrition Facts for {{ food_info.name|title }}:</h2>
         <ul>
-            <li><strong>Kalori:</strong> {{ food_info.calories }} kcal</li>
-            <li><strong>Karbonhidrat:</strong> {{ food_info.carbohydrates }} g</li>
-            <li><strong>Yağ:</strong> {{ food_info.fats }} g</li>
-            <li><strong>Protein:</strong> {{ food_info.proteins }} g</li>
-            <li><strong>Lif:</strong> {{ food_info.fiber }} g</li>
+            <li><strong>Calories:</strong> {{ food_info.calories }} kcal</li>
+            <li><strong>Carbohydrates:</strong> {{ food_info.carbohydrates }} g</li>
+            <li><strong>Fats:</strong> {{ food_info.fats }} g</li>
+            <li><strong>Proteins:</strong> {{ food_info.proteins }} g</li>
+            <li><strong>Fiber:</strong> {{ food_info.fiber }} g</li>
         </ul>
     {% endif %}
-</body>
-</html>
+{% endblock %}
