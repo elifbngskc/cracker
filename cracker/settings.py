@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'tracker.apps.TrackerConfig',
     'users.apps.UsersConfig',
     'crispy_forms',
+    "crispy_bootstrap4",
     
 ]
 
@@ -153,3 +154,15 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_REDIRECT_URL = 'tracker:home'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
