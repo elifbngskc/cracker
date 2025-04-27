@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-lo-#dh9z*xpe99=+xn^w#_29u6=y$=%2+n=c0r)puhbz85(wgg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', '51.21.249.202', 'crackerapp.atelieralice.net', ]
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', '51.21.249.202', 'ß56.228.14.97' 'crackerapp.atelieralice.net', ]
 
 
 # Application definition
