@@ -4,7 +4,11 @@
     <div class="content-section">
           <h2 class="account-heading">{{ user.username }}</h2>
         </div>
-      </div>
-      <!-- FORM HERE -->
+    </div>
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save</button>
+      </form>
     </div>
 {% endblock content %}

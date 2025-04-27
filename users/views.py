@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, ProfileForm
 
 
 def register(request):
@@ -19,4 +19,13 @@ def register(request):
 
 @login_required
 def profile(request):
-    return render(request, 'users/profile.html')
+    if request.method == 'POST':
+        form = ProfileForm(request.POST)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.user = request.user
+            profile.save()
+            return redirect('profile')  # ya da başka bir sayfaya yönlendirme
+    else:
+        form = ProfileForm()
+    return render(request, 'users/profile.html', {'form': form})
