@@ -17,3 +17,6 @@ COPY . .
 
 # Run migrations and start server (can be overridden in docker-compose)
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# For e-mail
+COPY .env /app/.env
