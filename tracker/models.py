@@ -10,6 +10,7 @@ ACTIVITY_LEVEL_CHOICES = [
 
 GENDER_CHOICES = [('male', 'Male'), ('female', 'Female')]
 
+
 class Profile(models.Model):
     
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -18,6 +19,7 @@ class Profile(models.Model):
     height = models.FloatField(help_text="cm")
     gender = models.CharField(max_length=6, choices=GENDER_CHOICES)
     activity_level = models.FloatField(choices=ACTIVITY_LEVEL_CHOICES, default=1.2)
+    goal = models.CharField(max_length=10, choices=[('maintain', 'Maintain'), ('lose', 'Lose weight'), ('gain', 'Gain weight')], default='maintain')
 
     def calculate_bmr(self):
         if self.gender == 'male':
@@ -28,7 +30,9 @@ class Profile(models.Model):
     def daily_calories(self):
         return self.calculate_bmr() * self.activity_level
 
-    def daily_macros(self, goal="maintain"):
+    def daily_macros(self):
+        goal = self.goal  # Use the goal stored in the profile
+
         total = self.daily_calories()
 
         if goal == "lose":

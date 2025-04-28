@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm
+from tracker.models import Profile
 
 
 def register(request):
@@ -19,4 +20,11 @@ def register(request):
 
 @login_required
 def profile(request):
-    return render(request, 'users/profile.html')
+    profile = get_object_or_404(Profile, user=request.user)
+
+    context = {
+        'profile': profile,
+        'daily_calories': round(profile.daily_calories()),
+        'daily_macros': profile.daily_macros(),}
+    
+    return render(request, 'users/profile.html', context)
