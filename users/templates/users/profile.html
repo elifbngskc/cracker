@@ -25,5 +25,9 @@
         <li><strong>Carbs:</strong> {{ daily_macros.carbs_g }} g</li>
         <li><strong>Fat:</strong> {{ daily_macros.fat_g }} g</li>
     </ul>
+
+    <a href="{% url 'edit_profile' %}">
+      <button>Edit Profile</button>
+    </a>
       
 {% endblock content %}

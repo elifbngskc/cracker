@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, ProfileForm
 from tracker.models import Profile
 
 
@@ -28,3 +28,16 @@ def profile(request):
         'daily_macros': profile.daily_macros(),}
     
     return render(request, 'users/profile.html', context)
+
+def edit_profile(request):
+    profile = get_object_or_404(Profile, user=request.user)
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = ProfileForm(instance=profile)
+
+    return render(request, 'users/edit_profile.html', {'form': form})
