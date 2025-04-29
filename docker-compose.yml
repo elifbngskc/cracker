@@ -24,3 +24,5 @@ services:
     image: ollama/ollama
     ports:
       - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
