@@ -70,6 +70,6 @@ def get_calories(request):
     return render(request, 'tracker/food_form.html', {'food_info': food_info, 'error': error})
 
 def get_llama_response(request):
-    prompt = "Bugün ne yesem?"  # test prompt
-    result = query_ollama(prompt)  # burada tanımlı
+    prompt = "Can you calculate my breakfast calories"
+    result = query_ollama(prompt)
     return JsonResponse({"response": result}) 
