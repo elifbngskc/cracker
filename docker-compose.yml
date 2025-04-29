@@ -15,6 +15,7 @@ services:
     environment:
       DEBUG: "1"
       DATABASE_URL: postgres://vaow:yYyPqw23pcyxLDNa@database-1.c1ewgim2iz3q.eu-north-1.rds.amazonaws.com:5432/cracker_db
+      OLLAMA_URL: http://ollama:11434
   redis:
     image: redis:7
     ports:
