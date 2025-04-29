@@ -3,6 +3,8 @@ from .forms import ProfileForm
 from django.contrib.auth.decorators import login_required
 import requests
 from .models import FoodItem
+from django.http import JsonResponse
+from .utils import query_ollama
 
 def home(request):
     return render(request, "tracker/home.html")
@@ -66,3 +68,8 @@ def get_calories(request):
                 error = 'Error fetching from API.'
 
     return render(request, 'tracker/food_form.html', {'food_info': food_info, 'error': error})
+
+def get_llama_response(request):
+    prompt = "Bugün ne yesem?"  # test prompt
+    result = query_ollama(prompt)  # burada tanımlı
+    return JsonResponse({"response": result}) 
