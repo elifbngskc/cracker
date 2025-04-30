@@ -1,12 +1,13 @@
 {% extends 'tracker/base.html' %}
 {% load crispy_forms_tags %}
-{% block content %}
-    <h1>My Profile</h1>
-    <div class="content-section">
-          <h2 class="account-heading">{{ user.username }}</h2>
-        </div>
-    </div>
 
+{% block content %}
+<h1 style="font-size: 2rem; margin-bottom: 20px; color: #333 ;">My Profile</h1>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 150px; font-size: 1.2rem;">
+  <!-- Left Column: Profile Info -->
+  <div>
+    <h2 class="account-heading" style="font-size: 1.6rem;">{{ user.username }}</h2>
     <p><strong>Age:</strong> {{ profile.age }} years old</p>
     <p><strong>Weight:</strong> {{ profile.weight }} kg</p>
     <p><strong>Height:</strong> {{ profile.height }} cm</p>
@@ -14,20 +15,22 @@
     <p><strong>Activity Level:</strong> {{ profile.get_activity_level_display }}</p>
     <p><strong>Goal:</strong> {{ profile.get_goal_display }}</p>
 
-    <hr>
+    <a href="{% url 'edit_profile' %}">
+      <button style="margin-top: 20px; font-size: 1rem; padding: 10px 10px;">Edit Profile</button>
+    </a>
+  </div>
 
-    <h2>Daily Needs</h2>
+  <!-- Right Column: Daily Needs -->
+  <div>
+    <h2 style="font-size: 1.6rem; color: #444;">Daily Needs</h2>
     <p><strong>Calories Needed:</strong> {{ daily_calories }} kcal</p>
 
-    <h3>Macronutrients</h3>
+    <h3 style="font-size: 1.4rem;">Macronutrients</h3>
     <ul>
-        <li><strong>Protein:</strong> {{ daily_macros.protein_g }} g</li>
-        <li><strong>Carbs:</strong> {{ daily_macros.carbs_g }} g</li>
-        <li><strong>Fat:</strong> {{ daily_macros.fat_g }} g</li>
+      <li><strong>Protein:</strong> {{ daily_macros.protein_g }} g</li>
+      <li><strong>Carbs:</strong> {{ daily_macros.carbs_g }} g</li>
+      <li><strong>Fat:</strong> {{ daily_macros.fat_g }} g</li>
     </ul>
-
-    <a href="{% url 'edit_profile' %}">
-      <button>Edit Profile</button>
-    </a>
-      
+  </div>
+</div>
 {% endblock content %}

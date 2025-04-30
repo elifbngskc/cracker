@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import ProfileForm
 from django.contrib.auth.decorators import login_required
 import requests
-from .models import FoodItem
+from .models import FoodItem, Profile
 from django.http import JsonResponse
 from .utils import query_ollama
 
@@ -26,7 +26,7 @@ def calc(request):
             return redirect('profile')
     else:
         form = ProfileForm()
-    return render(request, 'users/profile.html', {'form': form}) 
+    return render(request, 'tracker/calorie_calc.html', {'form': form}) 
 
 USDA_API_KEY = 'L3nkiRdZQeKTqXivIctEq22hyBP2eV8wE1CSY2cJ'
 
