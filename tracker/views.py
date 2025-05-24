@@ -92,15 +92,18 @@ def get_calories(request):
                         food_info = food
 
                         # Save on redis for 15 days
-                        result = r.setex(redis_key, 60 * 60 * 24 * 15, json.dumps({
-                            "name": food.name,
-                            "calories": food.calories,
-                            "carbohydrates": food.carbohydrates,
-                            "fats": food.fats,
-                            "proteins": food.proteins,
-                            "fiber": food.fiber
-                        }))
-                        print(f"Redis setex result for {redis_key}: {result}")
+                        try:
+                            r.setex(redis_key, 60 * 60 * 24 * 15, json.dumps({
+                                "name": food.name,
+                                "calories": food.calories,
+                                "carbohydrates": food.carbohydrates,
+                                "fats": food.fats,
+                                "proteins": food.proteins,
+                                "fiber": food.fiber
+                            }))
+                            print(f"Data cached in Redis with key {redis_key}")
+                        except Exception as e:
+                            print(f"Redis setex error: {e}")
 
                     except (IndexError, KeyError):
                         error = 'Food not found in API.'
