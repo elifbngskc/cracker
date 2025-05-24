@@ -1,5 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from django.core.management.base import BaseCommand
+from datetime import timedelta, date
+
+MEAL_CHOICES = [
+    ('breakfast', 'Breakfast'),
+    ('lunch', 'Lunch'),
+    ('dinner', 'Dinner'),
+    ('snack', 'Snack'),
+]
+
 
 ACTIVITY_LEVEL_CHOICES = [
     (1.2, "Sedentary (little to no exercise)"),
@@ -57,3 +68,28 @@ class FoodItem(models.Model):
 
     def __str__(self):
         return self.name
+
+class EatenFood(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    food = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
+    meal_type = models.CharField(max_length=10, choices=MEAL_CHOICES)
+    quantity = models.FloatField(default=1.0, help_text="Quantity in servings")
+    date = models.DateField(default=timezone.now)
+
+    def total_nutrients(self):
+        return {
+            'calories': self.food.calories * self.quantity if self.food.calories else 0,
+            'carbohydrates': self.food.carbohydrates * self.quantity if self.food.carbohydrates else 0,
+            'fats': self.food.fats * self.quantity if self.food.fats else 0,
+            'proteins': self.food.proteins * self.quantity if self.food.proteins else 0,
+            'fiber': self.food.fiber * self.quantity if self.food.fiber else 0,
+        }
+    
+
+class Command(BaseCommand):
+    help = 'Deletes EatenFood entries older than 15 days'
+
+    def handle(self, *args, **kwargs):
+        cutoff = date.today() - timedelta(days=15)
+        deleted, _ = EatenFood.objects.filter(date__lt=cutoff).delete()
+        self.stdout.write(f"Deleted {deleted} old EatenFood records.")

@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect
-from .forms import ProfileForm
+from .forms import ProfileForm, EatenFoodForm
 from django.contrib.auth.decorators import login_required
 import requests
-from .models import FoodItem, Profile
+from .models import FoodItem, Profile, EatenFood
 from django.http import JsonResponse
 from .utils import query_ollama
 import redis
 import json
 from django.conf import settings
+from collections import defaultdict
+from datetime import date
 
 def home(request):
     return render(request, "tracker/home.html")
@@ -116,3 +118,81 @@ def get_llama_response(request):
     prompt = "Can you calculate my breakfast calories"
     result = query_ollama(prompt)
     return JsonResponse({"response": result}) 
+
+@login_required
+def add_eaten_food(request):
+    if request.method == 'POST':
+        form = EatenFoodForm(request.POST)
+        if form.is_valid():
+            eaten = form.save(commit=False)
+            eaten.user = request.user
+            eaten.save()
+            return redirect('daily_summary')
+    else:
+        form = EatenFoodForm()
+    return render(request, 'tracker/add_eaten_food.html', {'form': form})
+
+@login_required
+def daily_summary(request):
+    today = date.today()
+    foods = EatenFood.objects.filter(user=request.user, date=today)
+
+    summary = defaultdict(lambda: {
+        'calories': 0, 'carbohydrates': 0, 'fats': 0, 'proteins': 0, 'fiber': 0
+    })
+
+    for food in foods:
+        nutrients = food.total_nutrients()
+        meal = food.meal_type
+        for key in summary[meal]:
+            summary[meal][key] += nutrients[key]
+
+    total = {key: sum(meal[key] for meal in summary.values()) for key in summary['breakfast']}
+
+    return render(request, 'tracker/daily_summary.html', {
+        'summary': dict(summary),
+        'total': total
+    })
+
+@login_required
+def meal_view(request, meal_type):
+    today = date.today()
+    foods = EatenFood.objects.filter(user=request.user, meal_type=meal_type, date=today)
+
+    total = {
+        'calories': sum(f.total_nutrients()['calories'] for f in foods),
+        'carbohydrates': sum(f.total_nutrients()['carbohydrates'] for f in foods),
+        'fats': sum(f.total_nutrients()['fats'] for f in foods),
+        'proteins': sum(f.total_nutrients()['proteins'] for f in foods),
+        'fiber': sum(f.total_nutrients()['fiber'] for f in foods),
+    }
+
+    return render(request, 'tracker/meal_view.html', {
+        'meal_type': meal_type,
+        'foods': foods,
+        'total': total
+    })
+
+@login_required
+def add_food_to_meal(request, meal_type):
+    search_results = None
+    if request.method == 'POST':
+        if 'search' in request.POST:
+            food_name = request.POST.get('food_name').strip().lower()
+            search_results = FoodItem.objects.filter(name__icontains=food_name)
+        elif 'add_food' in request.POST:
+            food_id = request.POST.get('food_id')
+            quantity = float(request.POST.get('quantity', 1))
+            food = FoodItem.objects.get(id=food_id)
+            EatenFood.objects.create(
+                user=request.user,
+                food=food,
+                meal_type=meal_type,
+                quantity=quantity
+            )
+            return redirect('meal_view', meal_type=meal_type)
+
+    return render(request, 'tracker/add_food_to_meal.html', {
+        'meal_type': meal_type,
+        'search_results': search_results
+    })

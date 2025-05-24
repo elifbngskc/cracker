@@ -1,0 +1,23 @@
+<h3>Add food to {{ meal_type|title }}</h3>
+
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="food_name" placeholder="Search for food..." />
+  <button type="submit" name="search">Search</button>
+</form>
+
+{% if search_results %}
+  <ul>
+    {% for food in search_results %}
+      <li>
+        {{ food.name }}
+        <form method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="food_id" value="{{ food.id }}" />
+          <input type="number" name="quantity" value="1" step="0.1" style="width:60px;" />
+          <button type="submit" name="add_food">Add</button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

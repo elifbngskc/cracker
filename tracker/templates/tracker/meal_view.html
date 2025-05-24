@@ -1,0 +1,9 @@
+<h2>{{ meal_type|title }}</h2>
+<ul>
+  {% for item in foods %}
+    <li>{{ item.food.name }} - {{ item.quantity }}x - {{ item.total_nutrients.calories }} kcal</li>
+  {% endfor %}
+</ul>
+
+<p>Total: {{ total.calories }} kcal</p>
+<a href="{% url 'add_food_to_meal' meal_type %}">➕ Add Food</a>
