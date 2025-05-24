@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from .utils import query_ollama
 import redis
 import json
+from django.conf import settings
 
 def home(request):
     return render(request, "tracker/home.html")
@@ -31,7 +32,11 @@ def calc(request):
     return render(request, 'tracker/calorie_calc.html', {'form': form}) 
 
 USDA_API_KEY = 'L3nkiRdZQeKTqXivIctEq22hyBP2eV8wE1CSY2cJ'
-r = redis.Redis(host='localhost', port=6379, db=0)
+r = redis.Redis(
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    db=1
+)
 
 def get_calories(request):
     food_info = None
@@ -39,11 +44,13 @@ def get_calories(request):
 
     if request.method == 'POST':
         food_name = request.POST.get('food', '').strip().lower()
+        print(f"Received food_name: {food_name}")
 
         redis_key = f"calories:{food_name}"
         cached_data = r.get(redis_key)
 
         if cached_data:
+            print("Data found in Redis:", cached_data)
             try:
                 data = json.loads(cached_data)
                 food_info = FoodItem(
@@ -55,8 +62,9 @@ def get_calories(request):
                     fiber=data.get('fiber')
                 )
             except Exception as e:
-                error = f"Redis verisi işlenemedi: {e}"
+                error = f"Redis data couldn't be processed: {e}"
         else:
+            print("Data couldn't be found, making API call.")
             try:
                 food = FoodItem.objects.get(name__iexact=food_name)
                 food_info = food
@@ -84,7 +92,7 @@ def get_calories(request):
                         food_info = food
 
                         # Save on redis for 15 days
-                        r.setex(redis_key, 60 * 60 * 24 * 15, json.dumps({
+                        result = r.setex(redis_key, 60 * 60 * 24 * 15, json.dumps({
                             "name": food.name,
                             "calories": food.calories,
                             "carbohydrates": food.carbohydrates,
@@ -92,6 +100,7 @@ def get_calories(request):
                             "proteins": food.proteins,
                             "fiber": food.fiber
                         }))
+                        print(f"Redis setex result for {redis_key}: {result}")
 
                     except (IndexError, KeyError):
                         error = 'Food not found in API.'
