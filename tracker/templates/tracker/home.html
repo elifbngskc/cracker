@@ -5,6 +5,46 @@
             <div class="container">
                 <h2 class="section-title">Welcome to Cracker!</h2>
                 <small class="section-subtitle">It may feel a bit empty, but we will have our grand opening in 2 weeks!</small>
+    <div class="max-w-4xl mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6">Today's Meals</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for meal, data in meal_data.items %}
+        <div class="bg-white shadow-md border border-gray-200 rounded-2xl p-4">
+            <div class="flex justify-between items-center mb-2">
+            <h2 class="text-xl font-semibold capitalize">{{ meal }}</h2>
+            <a href="{% url 'tracker:add_food_to_meal' meal %}" class="text-2xl text-blue-500 hover:text-blue-700">+</a>
+            </div>
+
+            {% if data.foods %}
+            <ul class="space-y-1 mb-3">
+                {% for food in data.foods %}
+                <li class="text-gray-700">{{ food.food.name }} (x{{ food.quantity }})</li>
+                {% endfor %}
+            </ul>
+            <div class="text-sm text-gray-600">
+                <p><strong>Calories:</strong> {{ data.total.calories }}</p>
+                <p><strong>Carbs:</strong> {{ data.total.carbohydrates }}g</p>
+                <p><strong>Fats:</strong> {{ data.total.fats }}g</p>
+                <p><strong>Proteins:</strong> {{ data.total.proteins }}g</p>
+                <p><strong>Fiber:</strong> {{ data.total.fiber }}g</p>
+            </div>
+            {% else %}
+            <p class="text-gray-500">No items yet.</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-8 bg-gray-100 p-4 rounded-xl shadow-inner">
+        <h2 class="text-xl font-semibold mb-2">Total for the Day</h2>
+        <p><strong>Calories:</strong> {{ day_total.calories }}</p>
+        <p><strong>Carbs:</strong> {{ day_total.carbohydrates }}g</p>
+        <p><strong>Fats:</strong> {{ day_total.fats }}g</p>
+        <p><strong>Proteins:</strong> {{ day_total.proteins }}g</p>
+        <p><strong>Fiber:</strong> {{ day_total.fiber }}g</p>
+    </div>
+    </div>
 
                 <div class="row">
                     <div class="col-md-3">

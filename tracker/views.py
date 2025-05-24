@@ -11,8 +11,38 @@ from django.conf import settings
 from collections import defaultdict
 from datetime import date
 
+@login_required
 def home(request):
-    return render(request, "tracker/home.html")
+    today = date.today()
+    meal_types = ['breakfast', 'lunch', 'dinner', 'snack']
+    meal_data = {}
+
+    for meal in meal_types:
+        foods = EatenFood.objects.filter(user=request.user, meal_type=meal, date=today)
+        total = {
+            'calories': sum(f.total_nutrients()['calories'] for f in foods),
+            'carbohydrates': sum(f.total_nutrients()['carbohydrates'] for f in foods),
+            'fats': sum(f.total_nutrients()['fats'] for f in foods),
+            'proteins': sum(f.total_nutrients()['proteins'] for f in foods),
+            'fiber': sum(f.total_nutrients()['fiber'] for f in foods),
+        }
+        meal_data[meal] = {
+            'foods': foods,
+            'total': total
+        }
+
+    # Day total
+    day_total = {
+        'calories': 0, 'carbohydrates': 0, 'fats': 0, 'proteins': 0, 'fiber': 0
+    }
+    for data in meal_data.values():
+        for key in day_total:
+            day_total[key] += data['total'][key]
+
+    return render(request, "tracker/home.html", {
+        'meal_data': meal_data,
+        'day_total': day_total
+    })
 
 def contact(request):
     return render(request, "tracker/contact.html")
@@ -190,7 +220,7 @@ def add_food_to_meal(request, meal_type):
                 meal_type=meal_type,
                 quantity=quantity
             )
-            return redirect('meal_view', meal_type=meal_type)
+            return redirect('tracker:meal_view', meal_type=meal_type)
 
     return render(request, 'tracker/add_food_to_meal.html', {
         'meal_type': meal_type,
