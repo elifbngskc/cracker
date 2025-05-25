@@ -163,6 +163,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'tracker:home'
 
+LOGIN_URL = '/login/'
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
