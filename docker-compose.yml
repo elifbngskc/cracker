@@ -30,3 +30,10 @@ services:
       - "11434:11434"
     environment:
       - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - ollama_data:/root/.ollama  # persist the models here
+    # command: ["run", "llama3"]
+    restart: always
+
+volumes:
+  ollama_data:
