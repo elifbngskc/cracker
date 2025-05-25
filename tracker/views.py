@@ -144,10 +144,35 @@ def get_calories(request):
 
     return render(request, 'tracker/food_form.html', {'food_info': food_info, 'error': error})
 
+@login_required
 def get_llama_response(request):
-    prompt = "Can you calculate my breakfast calories"
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        return JsonResponse({"error": "Profile not found."}, status=404)
+
+    age = profile.age
+    weight = profile.weight
+    height = profile.height
+    gender = profile.gender
+    activity_level = dict(profile.ACTIVITY_LEVEL_CHOICES).get(profile.activity_level, "Unknown")
+    goal = profile.goal
+
+    prompt = (
+        f"I have a user with the following profile:\n"
+        f"- Age: {age}\n"
+        f"- Weight: {weight} kg\n"
+        f"- Height: {height} cm\n"
+        f"- Gender: {gender}\n"
+        f"- Activity level: {activity_level}\n"
+        f"- Goal: {goal}\n\n"
+        f"Please suggest a healthy meal suitable for this user and tell me its approximate calorie content. "
+        f"Do NOT add this meal to any meal log or database; just provide the information."
+    )
+
     result = query_ollama(prompt)
-    return JsonResponse({"response": result}) 
+
+    return JsonResponse({"response": result})
 
 @login_required
 def add_eaten_food(request):
