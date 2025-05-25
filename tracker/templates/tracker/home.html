@@ -8,6 +8,18 @@
     <div class="max-w-4xl mx-auto p-6">
     <h1 class="text-3xl font-bold mb-6">Today's Meals</h1>
 
+    <div style="display: flex; gap: 20px;">
+        <div style="border: 1px solid #ccc; padding: 10px; border-radius: 10px;">
+            <strong>Needed:</strong> {{ needed_calories }} kcal
+        </div>
+        <div style="border: 1px solid #ccc; padding: 10px; border-radius: 10px;">
+            <p>Eaten: {{ day_total.calories }} kcal</p>
+        </div>
+        <div style="border: 1px solid #ccc; padding: 10px; border-radius: 10px;">
+            <strong>Remaining:</strong> {{ remaining_calories }} kcal
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {% for meal, data in meal_data.items %}
         <div class="bg-white shadow-md border border-gray-200 rounded-2xl p-4">
