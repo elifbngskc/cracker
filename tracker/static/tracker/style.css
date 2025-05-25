@@ -1134,19 +1134,39 @@ form textarea {
       display: none; } }
 
 #branding {
-  float: left; }
-  #branding .logo, #branding .logo-text {
-    display: inline-block;
-    vertical-align: middle; }
-  #branding .logo {
-    margin-right: 10px; }
-  #branding .site-title {
-    margin-bottom: 0;
-    font-size: 20px;
-    font-size: 1.25em; }
-    #branding .site-title a {
-      color: #768089; }
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
 
+#branding .logo {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+#branding .logo-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#branding .site-title {
+  margin: 0;
+  font-size: 1.25em;
+}
+
+#branding .site-title a {
+  color: #768089;
+  text-decoration: none;
+}
+
+.description {
+  font-size: 0.85em;
+  color: #999;
+  margin-top: 2px;
+}
 .right-section .phone, .right-section .search-form {
   display: inline-block;
   vertical-align: middle;

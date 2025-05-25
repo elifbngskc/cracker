@@ -39,9 +39,21 @@ def home(request):
         for key in day_total:
             day_total[key] += data['total'][key]
 
+    # Get needed and remaining calories
+    needed_calories = 0
+    remaining_calories = 0
+    try:
+        profile = Profile.objects.get(user=request.user)
+        needed_calories = profile.daily_calories()  # <-- fix here
+        remaining_calories = needed_calories - day_total['calories']
+    except Profile.DoesNotExist:
+        pass
+
     return render(request, "tracker/home.html", {
         'meal_data': meal_data,
-        'day_total': day_total
+        'day_total': day_total,
+        'needed_calories': needed_calories,
+        'remaining_calories': remaining_calories
     })
 
 def contact(request):
