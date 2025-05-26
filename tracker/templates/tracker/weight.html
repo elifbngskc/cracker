@@ -1,0 +1,17 @@
+{% extends "tracker/base.html" %}
+
+{% block content %}
+  <h2>Weekly Check-In</h2>
+  <p>Would you like to update your weight for a more accurate weekly analysis?</p>
+
+  <form method="get" action="{% url 'tracker:weekly_progress' %}">
+    <label for="weight">Enter new weight (kg):</label>
+    <input type="number" step="0.1" name="weight" id="weight" required>
+    <button type="submit">Submit</button>
+  </form>
+
+  <form method="get" action="{% url 'tracker:weekly_progress' %}">
+    <input type="hidden" name="skip_weight" value="1">
+    <button type="submit">I don’t want to answer right now</button>
+  </form>
+{% endblock %}

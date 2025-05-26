@@ -9,7 +9,8 @@ import redis
 import json
 from django.conf import settings
 from collections import defaultdict
-from datetime import date
+from datetime import date, timedelta
+from django.utils import timezone
 
 @login_required
 def home(request):
@@ -280,3 +281,103 @@ def add_food_to_meal(request, meal_type):
         'meal_type': meal_type,
         'search_results': search_results
     })
+
+@login_required
+def weekly_progress(request):
+    profile = request.user.profile
+    today = timezone.now().date()
+    week_start = today - timedelta(days=6)
+
+    # 👉 Ask for weight first, unless skipped
+    if request.method == 'GET' and 'skip_weight' not in request.GET and 'weight' not in request.GET:
+        return render(request, 'tracker/weight.html')
+
+    weight_msg = None
+    if request.method == 'GET' and 'weight' in request.GET:
+        try:
+            new_weight = float(request.GET.get("weight"))
+            old_weight = profile.weight
+            diff = new_weight - old_weight
+            profile.weight = new_weight
+            profile.save()
+            if abs(diff) < 0.1:
+                weight_msg = "Your weight stayed the same. Even so, fat loss and muscle gain may still be happening! Next week, focus on sleep and hydration."
+            elif diff > 0:
+                weight_msg = "You gained weight, but you’re still on track! Gains can come from muscles or fluctuations. Stay consistent and trust the process."
+            else:
+                weight_msg = "Congratulations! You lost weight. Keep up the consistent effort—you're doing amazing!"
+        except ValueError:
+            messages.error(request, "Please enter a valid number.")
+            return redirect("tracker:weekly_progress.html")
+
+    # 🔽 Continue with progress analysis
+    eaten_foods = EatenFood.objects.filter(user=request.user, date__range=(week_start, today))
+    daily_goals = profile.daily_macros()
+    daily_goal_cals = daily_goals["calories"]
+    daily_fat_limit = daily_goals["fat_g"]
+
+    day_summaries = {}
+    goal_days = 0
+    fat_warnings = 0
+    total_cals = 0
+    days_with_data = 0
+
+    for day_offset in range(7):
+        day = today - timedelta(days=day_offset)
+        foods = eaten_foods.filter(date=day)
+        if not foods.exists():
+            continue
+
+        day_total = sum(f.total_nutrients()['calories'] for f in foods)
+        fat_total = sum(f.total_nutrients()['fats'] for f in foods)
+
+        days_with_data += 1
+        total_cals += day_total
+
+        if abs(day_total - daily_goal_cals) < 150:
+            goal_days += 1
+        if fat_total > daily_fat_limit:
+            fat_warnings += 1
+
+        day_summaries[day] = {
+            "calories": day_total,
+            "fats": fat_total
+        }
+
+    # Summary messages
+    if days_with_data > 0:
+        avg_cals = total_cals / days_with_data
+        cal_diff = avg_cals - daily_goal_cals
+    else:
+        avg_cals = 0
+        cal_diff = 0
+
+    if cal_diff < -500:
+        cal_msg = "Please don’t starve yourself! We aim for consistency and health. Patience brings results. 🫶"
+    elif cal_diff > 500:
+        cal_msg = "Well… things happen, but my eyes are on you next week 👀👀"
+    else:
+        cal_msg = "You're mostly aligned with your calorie goals this week!"
+
+    if goal_days >= 6:
+        goal_streak = "Perfect! You hit your calorie goal most days! 🏆"
+    elif goal_days >= 4:
+        goal_streak = "Good! You're getting there. Keep it up! 💪"
+    else:
+        goal_streak = "I want to see you more in here! Let’s push harder next week 💥"
+
+    if fat_warnings > 0:
+        fat_msg = f"You went over your fat goal on {fat_warnings} day(s). Try to moderate fat sources next week!"
+    else:
+        fat_msg = None
+
+    context = {
+        "day_summaries": day_summaries,
+        "weight_msg": weight_msg,
+        "cal_msg": cal_msg,
+        "goal_streak": goal_streak,
+        "fat_msg": fat_msg,
+        "days_with_data": days_with_data
+    }
+
+    return render(request, "tracker/weekly_progress.html", context)
