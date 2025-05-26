@@ -88,15 +88,11 @@ def get_calories(request):
     error = None
 
     if request.method == 'POST':
-        input_name = request.POST.get('food', '').strip().lower()
-        print(f"Received food_name: {input_name}")
+        food_name = request.POST.get('food', '').strip().lower()
+        print(f"Received food_name: {food_name}")
 
-        # Veritabanında eşleşme arayalım
-        food = FoodItem.objects.filter(name__iexact=input_name).first()
-
-        # Eğer veritabanında varsa onun adını, yoksa input'u kullan
-        redis_key_name = food.name.lower() if food else input_name
-        redis_key = f"calories:{redis_key_name}"
+        # Redis anahtarı için lowercase api_name'i kullanalım
+        redis_key = f"calories:{food_name}"
         cached_data = r.get(redis_key)
 
         if cached_data:
@@ -113,47 +109,16 @@ def get_calories(request):
                 )
             except Exception as e:
                 error = f"Redis data couldn't be processed: {e}"
-        elif food:
-            # Redis'te yok ama DB'de var
-            food_info = food
-            try:
-                r.setex(redis_key, 60 * 60 * 24 * 15, json.dumps({
-                    "name": food.name,
-                    "calories": food.calories,
-                    "carbohydrates": food.carbohydrates,
-                    "fats": food.fats,
-                    "proteins": food.proteins,
-                    "fiber": food.fiber
-                }))
-            except Exception as e:
-                print(f"Redis setex error: {e}")
         else:
-            # API'den veri çekelim
-            url = f"https://api.nal.usda.gov/fdc/v1/foods/search?query={input_name}&api_key={USDA_API_KEY}"
-            response = requests.get(url)
-
-            if response.status_code == 200:
-                data = response.json()
-                try:
-                    first_result = data['foods'][0]
-                    nutrients = {
-                        nutrient['nutrientName']: nutrient['value']
-                        for nutrient in first_result.get('foodNutrients', [])
-                    }
-
-                    api_name = first_result.get('description', input_name).title().strip()
-
-                    food = FoodItem.objects.create(
-                        name=api_name,
-                        calories=nutrients.get('Energy'),
-                        carbohydrates=nutrients.get('Carbohydrate, by difference'),
-                        fats=nutrients.get('Total lipid (fat)'),
-                        proteins=nutrients.get('Protein'),
-                        fiber=nutrients.get('Fiber, total dietary')
-                    )
+            print("Data couldn't be found, making API call.")
+            try:
+                # Burada da veritabanında tam isim eşleşmesi değil,
+                # lowercase ile daha esnek arama yapılabilir
+                food = FoodItem.objects.filter(name__iexact=food_name).first()
+                if food:
                     food_info = food
-
-                    redis_key = f"calories:{api_name.lower()}"
+                    # Redis'e kaydet, api_name üzerinden değil ama burada eklenebilir
+                    redis_key = f"calories:{food.name.lower()}"
                     try:
                         r.setex(redis_key, 60 * 60 * 24 * 15, json.dumps({
                             "name": food.name,
@@ -163,14 +128,56 @@ def get_calories(request):
                             "proteins": food.proteins,
                             "fiber": food.fiber
                         }))
-                        print(f"Data cached in Redis with key {redis_key}")
                     except Exception as e:
                         print(f"Redis setex error: {e}")
 
-                except (IndexError, KeyError):
-                    error = 'Food not found in API.'
-            else:
-                error = 'Error fetching from API.'
+                else:
+                    url = f"https://api.nal.usda.gov/fdc/v1/foods/search?query={food_name}&api_key={USDA_API_KEY}"
+                    response = requests.get(url)
+
+                    if response.status_code == 200:
+                        data = response.json()
+                        try:
+                            first_result = data['foods'][0]
+                            nutrients = {
+                                nutrient['nutrientName']: nutrient['value']
+                                for nutrient in first_result.get('foodNutrients', [])
+                            }
+
+                            api_name = first_result.get('description', food_name).title().strip()
+
+                            food = FoodItem.objects.create(
+                                name=api_name,
+                                calories=nutrients.get('Energy'),
+                                carbohydrates=nutrients.get('Carbohydrate, by difference'),
+                                fats=nutrients.get('Total lipid (fat)'),
+                                proteins=nutrients.get('Protein'),
+                                fiber=nutrients.get('Fiber, total dietary')
+                            )
+                            food_info = food
+
+                            # Redis'e api_name ile kaydet
+                            redis_key = f"calories:{api_name.lower()}"
+                            try:
+                                r.setex(redis_key, 60 * 60 * 24 * 15, json.dumps({
+                                    "name": food.name,
+                                    "calories": food.calories,
+                                    "carbohydrates": food.carbohydrates,
+                                    "fats": food.fats,
+                                    "proteins": food.proteins,
+                                    "fiber": food.fiber
+                                }))
+                                print(f"Data cached in Redis with key {redis_key}")
+                            except Exception as e:
+                                print(f"Redis setex error: {e}")
+
+                        except (IndexError, KeyError):
+                            error = 'Food not found in API.'
+                    else:
+                        error = 'Error fetching from API.'
+
+            except Exception as e:
+                error = str(e)
 
     return render(request, 'tracker/food_form.html', {'food_info': food_info, 'error': error})
 
