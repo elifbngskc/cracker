@@ -1,92 +1,119 @@
 {% extends 'tracker/base.html' %}
 {% block content %}
+    <style>
+        .meal-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .meal-box {
+            flex: 1;
+            min-width: 220px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .meal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .calorie-boxes {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .calorie-box {
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            min-width: 120px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .summary-box {
+            background-color: #f3f3f3;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 15px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+    </style>
+
     <main class="main-content">
         <div class="fullwidth-block greet-section">
             <div class="container">
                 <h2 class="section-title">Welcome to Cracker!</h2>
                 <small class="section-subtitle">It may feel a bit empty, but we will have our grand opening in 2 weeks!</small>
-    <div class="max-w-4xl mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-6">Today's Meals</h1>
 
-    <div style="display: flex; gap: 20px;">
-        <div style="border: 1px solid #ccc; padding: 10px; border-radius: 10px;">
-            <strong>Needed:</strong> {{ needed_calories }} kcal
-        </div>
-        <div style="border: 1px solid #ccc; padding: 10px; border-radius: 10px;">
-            <p>Eaten: {{ day_total.calories }} kcal</p>
-        </div>
-        <div style="border: 1px solid #ccc; padding: 10px; border-radius: 10px;">
-            <strong>Remaining:</strong> {{ remaining_calories }} kcal
-        </div>
-    </div>
+                <div class="max-w-4xl mx-auto p-6">
+                    <h1 class="text-3xl font-bold mb-6">Today's Meals</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {% for meal, data in meal_data.items %}
-        <div class="bg-white shadow-md border border-gray-200 rounded-2xl p-4">
-            <div class="flex justify-between items-center mb-2">
-            <h2 class="text-xl font-semibold capitalize">{{ meal }}</h2>
-            <a href="{% url 'tracker:add_food_to_meal' meal %}" class="text-2xl text-blue-500 hover:text-blue-700">+</a>
+                    <div class="calorie-boxes">
+                        <div class="calorie-box">
+                            <strong>Needed</strong><br>{{ needed_calories }} kcal
+                        </div>
+                        <div class="calorie-box">
+                            <strong>Eaten</strong><br>{{ day_total.calories }} kcal
+                        </div>
+                        <div class="calorie-box">
+                            <strong>Remaining</strong><br>{{ remaining_calories }} kcal
+                        </div>
+                    </div>
+
+                    <div class="meal-container">
+                        {% for meal, data in meal_data.items %}
+                        <div class="meal-box">
+                            <div class="meal-header">
+                                <h2 class="text-xl font-semibold capitalize">{{ meal }}</h2>
+                                <a href="{% url 'tracker:add_food_to_meal' meal %}" class="text-2xl text-blue-500 hover:text-blue-700">+</a>
+                            </div>
+
+                            {% if data.foods %}
+                            <ul class="space-y-1 mb-3">
+                                {% for food in data.foods %}
+                                <li class="text-gray-700">{{ food.food.name }} (x{{ food.quantity }})</li>
+                                {% endfor %}
+                            </ul>
+                            <div class="text-sm text-gray-600">
+                                <p><strong>Calories:</strong> {{ data.total.calories }}</p>
+                            </div>
+                            {% else %}
+                            <p class="text-gray-500">No items yet.</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="summary-box">
+                        <h2 class="text-xl font-semibold mb-2">Total for the Day</h2>
+                        <p><strong>Calories:</strong> {{ day_total.calories }}</p>
+                        <p><strong>Carbs:</strong> {{ day_total.carbohydrates }}g</p>
+                        <p><strong>Fats:</strong> {{ day_total.fats }}g</p>
+                        <p><strong>Proteins:</strong> {{ day_total.proteins }}g</p>
+                        <p><strong>Fiber:</strong> {{ day_total.fiber }}g</p>
+                    </div>
+                </div>
             </div>
-
-            {% if data.foods %}
-            <ul class="space-y-1 mb-3">
-                {% for food in data.foods %}
-                <li class="text-gray-700">{{ food.food.name }} (x{{ food.quantity }})</li>
-                {% endfor %}
-            </ul>
-            <div class="text-sm text-gray-600">
-                <p><strong>Calories:</strong> {{ data.total.calories }}</p>
-            </div>
-            {% else %}
-            <p class="text-gray-500">No items yet.</p>
-            {% endif %}
         </div>
-        {% endfor %}
+    </main>
     </div>
 
-    <div class="mt-8 bg-gray-100 p-4 rounded-xl shadow-inner">
-        <h2 class="text-xl font-semibold mb-2">Total for the Day</h2>
-        <p><strong>Calories:</strong> {{ day_total.calories }}</p>
-        <p><strong>Carbs:</strong> {{ day_total.carbohydrates }}g</p>
-        <p><strong>Fats:</strong> {{ day_total.fats }}g</p>
-        <p><strong>Proteins:</strong> {{ day_total.proteins }}g</p>
-        <p><strong>Fiber:</strong> {{ day_total.fiber }}g</p>
-    </div>
-    </div>
-
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="feature">
-                            <i class="icon-phone-24"></i>
-                            <h3 class="feature-title">24 hours Service</h3>
-                            <p>We are trying to be always up with our services! At least we hope so...</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="feature">
-                            <i class="icon-hotel"></i>
-                            <h3 class="feature-title">Hospitality</h3>
-                            <p>Lorem ipsum dolor amet consectetur adipiscing elit do eiusmod tempor incididunt labore dolore magna aliqua.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="feature">
-                            <i class="icon-luggage"></i>
-                            <h3 class="feature-title">Praesent pellentesque </h3>
-                            <p>Lorem ipsum dolor amet consectetur adipiscing elit do eiusmod tempor incididunt labore dolore magna aliqua.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="feature">
-                            <i class="icon-credit-card-hand"></i>
-                            <h3 class="feature-title">Consectetur interdum</h3>
-                            <p>Lorem ipsum dolor amet consectetur adipiscing elit do eiusmod tempor incididunt labore dolore magna aliqua.</p>
-                        </div>
-                    </div>
-                </div> <!-- .row -->
 
                 <div class="text-center">
-                    <p>Sollicitudin sit tortor pellentesque. <a href="#">Read more</a></p>
+                    <p> </p>
                 </div>
             </div> <!-- .container -->
         </div> <!-- .fullwidth-block -->
