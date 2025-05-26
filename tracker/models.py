@@ -12,8 +12,6 @@ MEAL_CHOICES = [
 ]
 
 
-
-
 class Profile(models.Model):
     ACTIVITY_LEVEL_CHOICES = [
             (1.2, "Sedentary (little to no exercise)"),

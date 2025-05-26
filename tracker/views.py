@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ProfileForm, EatenFoodForm
 from django.contrib.auth.decorators import login_required
 import requests
@@ -250,13 +250,30 @@ def add_food_to_meal(request, meal_type):
         elif 'add_food' in request.POST:
             food_id = request.POST.get('food_id')
             quantity = float(request.POST.get('quantity', 1))
-            food = FoodItem.objects.get(id=food_id)
-            EatenFood.objects.create(
+            food = get_object_or_404(FoodItem, id=food_id)
+
+            today = date.today()
+            existing_entry = EatenFood.objects.filter(
                 user=request.user,
                 food=food,
                 meal_type=meal_type,
-                quantity=quantity
-            )
+                date=today
+            ).first()
+
+            if existing_entry:
+                # Add to existing quantity
+                existing_entry.quantity += quantity
+                existing_entry.save()
+            else:
+                # Create new entry
+                EatenFood.objects.create(
+                    user=request.user,
+                    food=food,
+                    meal_type=meal_type,
+                    quantity=quantity,
+                    date=today
+                )
+
             return redirect('tracker:meal_view', meal_type=meal_type)
 
     return render(request, 'tracker/add_food_to_meal.html', {
