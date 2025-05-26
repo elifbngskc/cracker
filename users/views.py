@@ -21,11 +21,14 @@ def register(request):
 @login_required
 def profile(request):
     profile = get_object_or_404(Profile, user=request.user)
+    ideal_wt = profile.ideal_weight_devine()
+
 
     context = {
         'profile': profile,
         'daily_calories': round(profile.daily_calories()),
-        'daily_macros': profile.daily_macros(),}
+        'daily_macros': profile.daily_macros(),
+        "ideal_weight": ideal_wt,}
     
     return render(request, 'users/profile.html', context)
 

@@ -55,6 +55,15 @@ class Profile(models.Model):
             'carbs_g': round((total * 0.4) / 4),
             'fat_g': round((total * 0.3) / 9),
             }
+    
+    def ideal_weight_devine(profile):
+        height_cm = profile.height
+        height_in = height_cm / 2.54
+        if profile.gender.lower() == 'male':
+            return round(50 + 2.3 * (height_in - 60), 1)
+        else:
+            return round(45.5 + 2.3 * (height_in - 60), 1)
+
 
 class FoodItem(models.Model):
     name = models.CharField(max_length=255, unique=True)

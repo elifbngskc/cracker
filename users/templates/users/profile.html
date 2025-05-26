@@ -6,6 +6,9 @@
 
 <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 150px; font-size: 1.2rem;">
   <!-- Left Column: Profile Info -->
+   {% if ideal_weight %}
+    <p>Your ideal weight is approximately <strong>{{ ideal_weight }} kg</strong>.</p>
+  {% endif %}
   <div>
     <h2 class="account-heading" style="font-size: 1.6rem;">{{ user.username }}</h2>
     <p><strong>Age:</strong> {{ profile.age }} years old</p>
