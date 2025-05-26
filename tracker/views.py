@@ -167,7 +167,7 @@ def get_llama_response(request):
     weight = profile.weight
     height = profile.height
     gender = profile.gender
-    activity_level = dict(profile.ACTIVITY_LEVEL_CHOICES).get(profile.activity_level, "Unknown")
+    activity_level = dict(Profile.ACTIVITY_LEVEL_CHOICES).get(profile.activity_level, "Unknown")
     goal = profile.goal
 
     prompt = (

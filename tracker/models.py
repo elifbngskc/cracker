@@ -12,18 +12,18 @@ MEAL_CHOICES = [
 ]
 
 
-ACTIVITY_LEVEL_CHOICES = [
-    (1.2, "Sedentary (little to no exercise)"),
-    (1.375, "Lightly active (1–3 times a week)"),
-    (1.55, "Moderately active (3–5 times a week)"),
-    (1.725, "Very active (6–7 times a week)"),
-    (1.9, "Extra active (intense daily training)"),]
-
-GENDER_CHOICES = [('male', 'Male'), ('female', 'Female')]
 
 
 class Profile(models.Model):
-    
+    ACTIVITY_LEVEL_CHOICES = [
+            (1.2, "Sedentary (little to no exercise)"),
+            (1.375, "Lightly active (1–3 times a week)"),
+            (1.55, "Moderately active (3–5 times a week)"),
+            (1.725, "Very active (6–7 times a week)"),
+            (1.9, "Extra active (intense daily training)"),]
+
+    GENDER_CHOICES = [('male', 'Male'), ('female', 'Female')]
+            
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     age = models.IntegerField()
     weight = models.FloatField(help_text="kg")
