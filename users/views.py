@@ -49,7 +49,7 @@ def register(request):
             email.send()
 
             messages.success(request, 'Account created! Please confirm your email to activate your account.')
-            return redirect('login')
+            return redirect('profile')
     else:
         form = UserRegisterForm()
     return render(request, 'users/register.html', {'form': form})
