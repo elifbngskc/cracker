@@ -27,8 +27,14 @@ SECRET_KEY = 'django-insecure-lo-#dh9z*xpe99=+xn^w#_29u6=y$=%2+n=c0r)puhbz85(wgg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1','51.21.249.202', 'localhost', '56.228.14.97']
-
+ALLOWED_HOSTS = [
+    '0.0.0.0',
+    '127.0.0.1',
+    'localhost',
+    '51.21.249.202',
+    '56.228.14.97',
+    'crackerapp.atelieralice.net',
+]
 
 # Application definition
 
@@ -40,6 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tracker.apps.TrackerConfig',
+    'users.apps.UsersConfig',
+    'crispy_forms',
+    "crispy_bootstrap4",
+    
 ]
 
 MIDDLEWARE = [
@@ -144,4 +154,41 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ["bootstrap4"]
+CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_REDIRECT_URL = 'tracker:home'
+
+LOGIN_URL = '/login/'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.atelieralice.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD') # nuh uh
+DEFAULT_FROM_EMAIL = env('EMAIL_HOST_USER')
+
+OLLAMA_API_URL = 'http://ollama:11434'  # Ollama API URL

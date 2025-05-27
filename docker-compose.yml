@@ -1,12 +1,37 @@
-
 services:
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
+    env_file:
+      - .env
     ports:
       - "8000:8000"
+    depends_on:
+      - redis
+      - ollama
     environment:
       DEBUG: "1"
       DATABASE_URL: postgres://vaow:yYyPqw23pcyxLDNa@database-1.c1ewgim2iz3q.eu-north-1.rds.amazonaws.com:5432/cracker_db
+      OLLAMA_URL: http://ollama:11434
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: always
+
+volumes:
+  ollama_data:

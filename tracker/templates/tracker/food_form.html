@@ -1,0 +1,30 @@
+{% extends 'tracker/base.html' %}
+
+{% block content %}
+    <h1>Find Food Information</h1>
+    <p style="color: #888; font-size: 0.9em;">Nutritional information is provided per 100 grams or per unit.</p>
+
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="food" placeholder="Enter food name" required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if food_info %}
+        <div style="margin-top: 30px;">
+            <h2>Nutrition Facts for {{ food_info.name|title }}:</h2>
+            <ul>
+                <li><strong>Calories:</strong> {{ food_info.calories }} kcal</li>
+                <li><strong>Carbohydrates:</strong> {{ food_info.carbohydrates }} g</li>
+                <li><strong>Fats:</strong> {{ food_info.fats }} g</li>
+                <li><strong>Proteins:</strong> {{ food_info.proteins }} g</li>
+                <li><strong>Fiber:</strong> {{ food_info.fiber }} g</li>
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}
