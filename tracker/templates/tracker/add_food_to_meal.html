@@ -1,6 +1,7 @@
 {% extends 'tracker/base.html' %}
 {% block content %}
     <h3>Add food to {{ meal_type|title }}</h3>
+    <p style="color: #888; font-size: 0.9em;">Nutritional information is provided per 100 grams or per unit.</p>
 
     <form method="post">
     {% csrf_token %}

@@ -1,4 +1,8 @@
-{% if weight_msg %}<p>{{ weight_msg }}</p>{% endif %}
-{% if cal_msg %}<p>{{ cal_msg }}</p>{% endif %}
-{% if goal_streak %}<p>{{ goal_streak }}</p>{% endif %}
-{% if fat_msg %}<p style="color:red;">{{ fat_msg }}</p>{% endif %}
+{% extends "tracker/base.html" %}
+
+{% block content %}
+    {% if weight_msg %}<p>{{ weight_msg }}</p>{% endif %}
+    {% if cal_msg %}<p>{{ cal_msg }}</p>{% endif %}
+    {% if goal_streak %}<p>{{ goal_streak }}</p>{% endif %}
+    {% if fat_msg %}<p style="color:red;">{{ fat_msg }}</p>{% endif %}
+{% endblock %}
