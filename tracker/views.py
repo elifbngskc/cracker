@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ProfileForm, EatenFoodForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 import requests
 from .models import FoodItem, Profile, EatenFood
 from django.http import JsonResponse
@@ -393,7 +394,7 @@ def weekly_progress(request):
     today = timezone.now().date()
     week_start = today - timedelta(days=6)
 
-    # 👉 Ask for weight first, unless skipped
+    # Ask for weight entry if not skipped
     if request.method == 'GET' and 'skip_weight' not in request.GET and 'weight' not in request.GET:
         return render(request, 'tracker/weight.html')
 
@@ -405,6 +406,7 @@ def weekly_progress(request):
             diff = new_weight - old_weight
             profile.weight = new_weight
             profile.save()
+
             if abs(diff) < 0.1:
                 weight_msg = "Your weight stayed the same. Even so, fat loss and muscle gain may still be happening! Next week, focus on sleep and hydration."
             elif diff > 0:
@@ -413,9 +415,8 @@ def weekly_progress(request):
                 weight_msg = "Congratulations! You lost weight. Keep up the consistent effort—you're doing amazing!"
         except ValueError:
             messages.error(request, "Please enter a valid number.")
-            return redirect("tracker:weekly_progress.html")
+            return redirect("tracker:weekly_progress")
 
-    # 🔽 Continue with progress analysis
     eaten_foods = EatenFood.objects.filter(user=request.user, date__range=(week_start, today))
     daily_goals = profile.daily_macros()
     daily_goal_cals = daily_goals["calories"]
@@ -449,7 +450,7 @@ def weekly_progress(request):
             "fats": fat_total
         }
 
-    # Summary messages
+    # Analysis messages
     if days_with_data > 0:
         avg_cals = total_cals / days_with_data
         cal_diff = avg_cals - daily_goal_cals
@@ -471,10 +472,10 @@ def weekly_progress(request):
     else:
         goal_streak = "I want to see you more in here! Let’s push harder next week 💥"
 
-    if fat_warnings > 0:
-        fat_msg = f"You went over your fat goal on {fat_warnings} day(s). Try to moderate fat sources next week!"
-    else:
-        fat_msg = None
+    fat_msg = (
+        f"You went over your fat goal on {fat_warnings} day(s). Try to moderate fat sources next week!"
+        if fat_warnings > 0 else None
+    )
 
     context = {
         "day_summaries": day_summaries,

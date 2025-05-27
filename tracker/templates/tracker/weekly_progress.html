@@ -1,8 +1,56 @@
 {% extends "tracker/base.html" %}
-
 {% block content %}
-    {% if weight_msg %}<p>{{ weight_msg }}</p>{% endif %}
-    {% if cal_msg %}<p>{{ cal_msg }}</p>{% endif %}
-    {% if goal_streak %}<p>{{ goal_streak }}</p>{% endif %}
-    {% if fat_msg %}<p style="color:red;">{{ fat_msg }}</p>{% endif %}
+<div class="weekly-progress-container">
+  <h1>📈 Weekly Progress</h1>
+
+  <!-- ✅ Weight Message -->
+  {% if weight_msg %}
+    <div class="alert alert-success">{{ weight_msg }}</div>
+  {% endif %}
+
+  {% if days_with_data > 0 %}
+    <!-- ✅ Nutritional Summary -->
+    <section class="summary-section">
+      <h2>📊 Your Calorie & Fat Intake This Week</h2>
+      <ul class="week-summary">
+        {% for day, summary in day_summaries.items %}
+          <li>
+            <strong>{{ day|date:"l, M j" }}</strong>: 
+            {{ summary.calories }} kcal, 
+            {{ summary.fats }}g fat
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <!-- ✅ Insight Summary -->
+    <section class="analysis-section">
+      <h2>🧠 Insights</h2>
+      <p><strong>Calorie Feedback:</strong> {{ cal_msg }}</p>
+      <p><strong>Goal Streak:</strong> {{ goal_streak }}</p>
+      {% if fat_msg %}
+        <p><strong>Fat Intake:</strong> {{ fat_msg }}</p>
+      {% endif %}
+
+      <!-- ⏳ Bonus Insight (optional) -->
+      <p><strong>Tracked Days:</strong> {{ days_with_data }}/7</p>
+    </section>
+
+    <!-- ✅ Motivational Message -->
+    <section class="summary-message">
+      {% if days_with_data >= 5 %}
+        <p class="motivation">🔥 You're actively tracking — that’s amazing consistency!</p>
+      {% elif days_with_data > 0 %}
+        <p class="motivation">👏 Nice work! Try tracking a few more days next week for better accuracy.</p>
+      {% endif %}
+    </section>
+  {% else %}
+    <!-- 🚨 No Data State -->
+    <section class="empty-data">
+      <p>This week looks a bit empty...😶</p>
+      <p>Start logging your meals to see your weekly progress!</p>
+      <a href="{% url 'tracker:home' %}" class="btn btn-primary">Log a Meal</a>
+    </section>
+  {% endif %}
+</div>
 {% endblock %}
