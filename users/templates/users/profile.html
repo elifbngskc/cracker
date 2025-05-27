@@ -2,7 +2,16 @@
 
 {% block content %}
 <style>
-  /* Scoped styling just for this page */
+  /* Override base col-md-4 to make content full width and centered */
+  .container > .col-md-4 {
+    width: 100% !important;
+    max-width: 1100px; /* max width for the profile content */
+    margin: 0 auto !important;
+    padding: 0 15px !important;
+    display: block !important;
+  }
+
+  /* Profile page container */
   #profile-wrapper {
     max-width: 1100px;
     margin: 40px auto;
@@ -104,7 +113,7 @@
 </style>
 
 <div id="profile-wrapper">
-  <h1>Welcome {{user.username}}</h1>
+  <h1>Welcome {{ user.username }}</h1>
 
   {% if profile %}
     {% if ideal_weight %}
@@ -147,7 +156,5 @@
     <h3>This looks so empty, let's learn your body better first.</h3>
     <a href="{% url 'tracker:calc' %}">Calculate your BMI</a>
   {% endif %}
-
 </div>
-
 {% endblock %}
