@@ -73,16 +73,24 @@ def activate(request, uidb64, token):
 
 @login_required
 def profile(request):
-    profile = get_object_or_404(Profile, user=request.user)
-    ideal_wt = profile.ideal_weight_devine()
+    try:
+        profile = request.user.profile  # assumes OneToOneField from Profile to User
+        ideal_wt = profile.ideal_weight_devine()
+        context = {
+            'profile': profile,
+            'daily_calories': round(profile.daily_calories()),
+            'daily_macros': profile.daily_macros(),
+            "ideal_weight": ideal_wt,
+        }
+    except Profile.DoesNotExist:
+        # No profile yet, show "empty" profile page
+        context = {
+            'profile': None,
+            'ideal_weight': None,
+            'daily_macros': None,
+            'daily_calories': None,
+        }
 
-
-    context = {
-        'profile': profile,
-        'daily_calories': round(profile.daily_calories()),
-        'daily_macros': profile.daily_macros(),
-        "ideal_weight": ideal_wt,}
-    
     return render(request, 'users/profile.html', context)
 
 def edit_profile(request):

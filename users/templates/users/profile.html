@@ -104,43 +104,50 @@
 </style>
 
 <div id="profile-wrapper">
-  <h1>My Profile</h1>
+  <h1>Welcome {{user.username}}</h1>
 
-  {% if ideal_weight %}
-    <p id="ideal-weight-msg">
-      Your ideal weight is approximately <strong>{{ ideal_weight }} kg</strong>.
-    </p>
+  {% if profile %}
+    {% if ideal_weight %}
+      <p id="ideal-weight-msg">
+        Your ideal weight is approximately <strong>{{ ideal_weight }} kg</strong>.
+      </p>
+    {% endif %}
+
+    <div id="profile-grid">
+      <section class="profile-info">
+        <h2>{{ user.username }}</h2>
+        <p><strong>Age:</strong> {{ profile.age }} years old</p>
+        <p><strong>Weight:</strong> {{ profile.weight }} kg</p>
+        <p><strong>Height:</strong> {{ profile.height }} cm</p>
+        <p><strong>Gender:</strong> {{ profile.get_gender_display }}</p>
+        <p><strong>Activity Level:</strong> {{ profile.get_activity_level_display }}</p>
+        <p><strong>Goal:</strong> {{ profile.get_goal_display }}</p>
+
+        <a href="{% url 'edit_profile' %}" class="edit-profile-btn">Edit Profile</a>
+      </section>
+
+      <section class="daily-needs">
+        <h2>Daily Needs</h2>
+        <p><strong>Calories Needed:</strong> {{ daily_calories }} kcal</p>
+
+        <h3>Macronutrients</h3>
+        <ul>
+          <li><strong>Protein:</strong> {{ daily_macros.protein_g }} g</li>
+          <li><strong>Carbs:</strong> {{ daily_macros.carbs_g }} g</li>
+          <li><strong>Fat:</strong> {{ daily_macros.fat_g }} g</li>
+        </ul>
+      </section>
+    </div>
+
+    <div id="weekly-progress-link">
+      <a href="{% url 'tracker:weekly_progress' %}">View Weekly Progress</a>
+    </div>
+
+  {% else %}
+    <h3>This looks so empty, let's learn your body better first.</h3>
+    <a href="{% url 'tracker:calc' %}">Calculate your BMI</a>
   {% endif %}
 
-  <div id="profile-grid">
-    <section class="profile-info">
-      <h2>{{ user.username }}</h2>
-      <p><strong>Age:</strong> {{ profile.age }} years old</p>
-      <p><strong>Weight:</strong> {{ profile.weight }} kg</p>
-      <p><strong>Height:</strong> {{ profile.height }} cm</p>
-      <p><strong>Gender:</strong> {{ profile.get_gender_display }}</p>
-      <p><strong>Activity Level:</strong> {{ profile.get_activity_level_display }}</p>
-      <p><strong>Goal:</strong> {{ profile.get_goal_display }}</p>
-
-      <a href="{% url 'edit_profile' %}" class="edit-profile-btn">Edit Profile</a>
-    </section>
-
-    <section class="daily-needs">
-      <h2>Daily Needs</h2>
-      <p><strong>Calories Needed:</strong> {{ daily_calories }} kcal</p>
-
-      <h3>Macronutrients</h3>
-      <ul>
-        <li><strong>Protein:</strong> {{ daily_macros.protein_g }} g</li>
-        <li><strong>Carbs:</strong> {{ daily_macros.carbs_g }} g</li>
-        <li><strong>Fat:</strong> {{ daily_macros.fat_g }} g</li>
-      </ul>
-    </section>
-  </div>
-
-  <div id="weekly-progress-link">
-    <a href="{% url 'tracker:weekly_progress' %}">View Weekly Progress</a>
-  </div>
 </div>
 
-{% endblock content %}
+{% endblock %}
