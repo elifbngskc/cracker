@@ -1,42 +1,146 @@
 {% extends 'tracker/base.html' %}
-{% load crispy_forms_tags %}
 
 {% block content %}
-<h1 style="font-size: 2rem; margin-bottom: 20px; color: #333 ;">My Profile</h1>
+<style>
+  /* Scoped styling just for this page */
+  #profile-wrapper {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 15px;
+  }
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 150px; font-size: 1.2rem;">
-  <!-- Left Column: Profile Info -->
-   {% if ideal_weight %}
-    <p>Your ideal weight is approximately <strong>{{ ideal_weight }} kg</strong>.</p>
+  #profile-grid {
+    display: flex;
+    gap: 50px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .profile-info, .daily-needs {
+    background-color: #fafafa;
+    padding: 30px 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    flex: 1 1 480px;
+    max-width: 520px;
+    color: #222;
+  }
+
+  .profile-info h2, .daily-needs h2 {
+    margin-top: 0;
+    font-weight: 700;
+    font-size: 1.8rem;
+  }
+
+  .profile-info p, .daily-needs p, .daily-needs ul li {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+
+  .daily-needs h3 {
+    margin-top: 25px;
+    font-size: 1.4rem;
+  }
+
+  .daily-needs ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .daily-needs ul li {
+    padding-left: 10px;
+    position: relative;
+  }
+  .daily-needs ul li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #3498db;
+  }
+
+  a.edit-profile-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 22px;
+    background: #3498db;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  a.edit-profile-btn:hover {
+    background: #2980b9;
+  }
+
+  #weekly-progress-link {
+    margin-top: 45px;
+    text-align: center;
+  }
+  #weekly-progress-link a {
+    color: #3498db;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-decoration: none;
+  }
+  #weekly-progress-link a:hover {
+    text-decoration: underline;
+  }
+
+  /* Center heading */
+  #profile-wrapper > h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.4rem;
+  }
+
+  /* Ideal weight message */
+  #ideal-weight-msg {
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 600;
+    color: #34495e;
+  }
+</style>
+
+<div id="profile-wrapper">
+  <h1>My Profile</h1>
+
+  {% if ideal_weight %}
+    <p id="ideal-weight-msg">
+      Your ideal weight is approximately <strong>{{ ideal_weight }} kg</strong>.
+    </p>
   {% endif %}
-  <div>
-    <h2 class="account-heading" style="font-size: 1.6rem;">{{ user.username }}</h2>
-    <p><strong>Age:</strong> {{ profile.age }} years old</p>
-    <p><strong>Weight:</strong> {{ profile.weight }} kg</p>
-    <p><strong>Height:</strong> {{ profile.height }} cm</p>
-    <p><strong>Gender:</strong> {{ profile.get_gender_display }}</p>
-    <p><strong>Activity Level:</strong> {{ profile.get_activity_level_display }}</p>
-    <p><strong>Goal:</strong> {{ profile.get_goal_display }}</p>
 
-    <a href="{% url 'edit_profile' %}">
-      <button style="margin-top: 20px; font-size: 1rem; padding: 10px 10px;">Edit Profile</button>
-    </a>
+  <div id="profile-grid">
+    <section class="profile-info">
+      <h2>{{ user.username }}</h2>
+      <p><strong>Age:</strong> {{ profile.age }} years old</p>
+      <p><strong>Weight:</strong> {{ profile.weight }} kg</p>
+      <p><strong>Height:</strong> {{ profile.height }} cm</p>
+      <p><strong>Gender:</strong> {{ profile.get_gender_display }}</p>
+      <p><strong>Activity Level:</strong> {{ profile.get_activity_level_display }}</p>
+      <p><strong>Goal:</strong> {{ profile.get_goal_display }}</p>
+
+      <a href="{% url 'edit_profile' %}" class="edit-profile-btn">Edit Profile</a>
+    </section>
+
+    <section class="daily-needs">
+      <h2>Daily Needs</h2>
+      <p><strong>Calories Needed:</strong> {{ daily_calories }} kcal</p>
+
+      <h3>Macronutrients</h3>
+      <ul>
+        <li><strong>Protein:</strong> {{ daily_macros.protein_g }} g</li>
+        <li><strong>Carbs:</strong> {{ daily_macros.carbs_g }} g</li>
+        <li><strong>Fat:</strong> {{ daily_macros.fat_g }} g</li>
+      </ul>
+    </section>
   </div>
 
-  <a href="{% url 'tracker:weekly_progress' %}">View Weekly Progress</a>
-
-
-  <!-- Right Column: Daily Needs -->
-  <div>
-    <h2 style="font-size: 1.6rem; color: #444;">Daily Needs</h2>
-    <p><strong>Calories Needed:</strong> {{ daily_calories }} kcal</p>
-
-    <h3 style="font-size: 1.4rem;">Macronutrients</h3>
-    <ul>
-      <li><strong>Protein:</strong> {{ daily_macros.protein_g }} g</li>
-      <li><strong>Carbs:</strong> {{ daily_macros.carbs_g }} g</li>
-      <li><strong>Fat:</strong> {{ daily_macros.fat_g }} g</li>
-    </ul>
+  <div id="weekly-progress-link">
+    <a href="{% url 'tracker:weekly_progress' %}">View Weekly Progress</a>
   </div>
 </div>
+
 {% endblock content %}

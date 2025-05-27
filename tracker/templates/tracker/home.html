@@ -24,6 +24,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            text-transform: capitalize;
+
         }
 
         .calorie-boxes {
@@ -46,9 +48,31 @@
         .summary-box {
             background-color: #f3f3f3;
             padding: 20px;
-            margin-top: 30px;
+            margin: 30px auto; /* adds vertical space + centers it */
             border-radius: 15px;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            max-width: 400px; /* controls the box width */
+            width: 100%; /* ensures responsiveness */
+        }
+
+
+        .plus-button {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            border-radius: 50%;
+            background-color: #3b82f6; /* Tailwind's blue-500 */
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .plus-button:hover {
+            background-color: #1e40af; /* Tailwind's blue-800 */
         }
     </style>
 
@@ -63,13 +87,13 @@
 
                     <div class="calorie-boxes">
                         <div class="calorie-box">
-                            <strong>Needed</strong><br>{{ needed_calories }} kcal
+                            <strong>Needed</strong><br>{{ needed_calories|floatformat:0 }} kcal
                         </div>
                         <div class="calorie-box">
-                            <strong>Eaten</strong><br>{{ day_total.calories }} kcal
+                            <strong>Eaten</strong><br>{{ day_total.calories|floatformat:0 }} kcal
                         </div>
                         <div class="calorie-box">
-                            <strong>Remaining</strong><br>{{ remaining_calories }} kcal
+                            <strong>Remaining</strong><br>{{ remaining_calories|floatformat:0 }} kcal
                         </div>
                     </div>
 
@@ -78,17 +102,17 @@
                         <div class="meal-box">
                             <div class="meal-header">
                                 <h2 class="text-xl font-semibold capitalize">{{ meal }}</h2>
-                                <a href="{% url 'tracker:add_food_to_meal' meal %}" class="text-2xl text-blue-500 hover:text-blue-700">+</a>
+                                <a href="{% url 'tracker:add_food_to_meal' meal %}" class="plus-button">+</a>
                             </div>
 
                             {% if data.foods %}
-                            <ul class="space-y-1 mb-3">
+                            <ul class="space-y-1 mb-3" style="list-style-position: inside;">
                                 {% for food in data.foods %}
                                 <li class="text-gray-700">{{ food.food.name }} (x{{ food.quantity }})</li>
                                 {% endfor %}
                             </ul>
                             <div class="text-sm text-gray-600">
-                                <p><strong>Calories:</strong> {{ data.total.calories }}</p>
+                                <p><strong>Calories:</strong> {{ data.total.calories|floatformat:0 }}</p>
                             </div>
                             {% else %}
                             <p class="text-gray-500">No items yet.</p>
@@ -99,11 +123,11 @@
 
                     <div class="summary-box">
                         <h2 class="text-xl font-semibold mb-2">Total for the Day</h2>
-                        <p><strong>Calories:</strong> {{ day_total.calories }}</p>
-                        <p><strong>Carbs:</strong> {{ day_total.carbohydrates }}g</p>
-                        <p><strong>Fats:</strong> {{ day_total.fats }}g</p>
-                        <p><strong>Proteins:</strong> {{ day_total.proteins }}g</p>
-                        <p><strong>Fiber:</strong> {{ day_total.fiber }}g</p>
+                        <p><strong>Calories:</strong> {{ day_total.calories|floatformat:0 }}</p>
+                        <p><strong>Carbs:</strong> {{ day_total.carbohydrates|floatformat:0 }}g</p>
+                        <p><strong>Fats:</strong> {{ day_total.fats|floatformat:0 }}g</p>
+                        <p><strong>Proteins:</strong> {{ day_total.proteins|floatformat:0 }}g</p>
+                        <p><strong>Fiber:</strong> {{ day_total.fiber|floatformat:0 }}g</p>
                     </div>
                 </div>
             </div>
