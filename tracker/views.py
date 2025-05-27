@@ -189,6 +189,24 @@ def get_llama_response(request):
     except Profile.DoesNotExist:
         return JsonResponse({"error": "Profile not found."}, status=404)
 
+    # Kullanıcının bugünkü yedikleri
+    today = date.today()
+    foods = EatenFood.objects.filter(user=request.user, date=today)
+
+    # Toplam besin hesaplama
+    total_nutrients = {
+        'calories': 0, 'carbohydrates': 0, 'fats': 0, 'proteins': 0, 'fiber': 0
+    }
+    for food in foods:
+        nutrients = food.total_nutrients()
+        for key in total_nutrients:
+            total_nutrients[key] += nutrients[key]
+
+    taken_calories = total_nutrients['calories']
+    needed_calories = profile.daily_calories()
+    remaining_calories = needed_calories - taken_calories
+
+    # Temel bilgiler
     age = profile.age
     weight = profile.weight
     height = profile.height
@@ -196,20 +214,22 @@ def get_llama_response(request):
     activity_level = dict(Profile.ACTIVITY_LEVEL_CHOICES).get(profile.activity_level, "Unknown")
     goal = profile.goal
 
+    # Prompt oluştur
     prompt = (
-        f"I have a user with the following profile:\n"
+        f"My profile is as follows:\n"
         f"- Age: {age}\n"
         f"- Weight: {weight} kg\n"
         f"- Height: {height} cm\n"
         f"- Gender: {gender}\n"
         f"- Activity level: {activity_level}\n"
         f"- Goal: {goal}\n\n"
-        f"Please suggest a healthy meal suitable for this user and tell me its approximate calorie content. "
-        f"Do NOT add this meal to any meal log or database; just provide the information."
+        f"Today, I consumed approximately {taken_calories} calories.\n"
+        f"My target is {needed_calories} calories, so I have about {remaining_calories} calories remaining to take today.\n"
+        f"If my {remaining_calories} calories is low compared to {needed_calories}, or is negative I shouldn't eat anything more today.\n\n"
+        f"If my {needed_calories} is negative don't recommend me a meal. Otherwise recommend me a healthy meal that fits within the remaining calories. Include an approximate calorie count for the meal. "
     )
 
     result = query_ollama(prompt)
-
     return JsonResponse({"response": result})
 
 @login_required
