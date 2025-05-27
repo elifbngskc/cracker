@@ -1,127 +1,136 @@
 {% extends 'tracker/base.html' %}
 {% load static %}
 {% block content %}
-    <style>
-        .meal-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 20px;
-            margin-top: 20px;
-        }
+<style>
+    .meal-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 20px;
+        margin-top: 20px;
+    }
 
-        .meal-box {
-            flex: 1;
-            min-width: 220px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+    .meal-box {
+        flex: 1;
+        min-width: 220px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 15px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-        .meal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            text-transform: capitalize;
+    .meal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        text-transform: capitalize;
+    }
 
-        }
+    .calorie-boxes {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin: 20px 0;
+    }
 
-        .calorie-boxes {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
-        }
+    .calorie-box {
+        border: 1px solid #ccc;
+        padding: 10px 20px;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        text-align: center;
+        font-weight: 500;
+    }
 
-        .calorie-box {
-            border: 1px solid #ccc;
-            padding: 10px 20px;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            min-width: 120px;
-            text-align: center;
-            font-weight: 500;
-        }
+    .summary-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 30px;
+    }
 
-        .summary-box {
-            background-color: #f3f3f3;
-            padding: 20px;
-            margin: 30px auto; /* adds vertical space + centers it */
-            border-radius: 15px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-            max-width: 400px; /* controls the box width */
-            width: 100%; /* ensures responsiveness */
-        }
+    .summary-box {
+        flex: 1;
+        min-width: 300px;
+        max-width: 500px;
+        background-color: #f3f3f3;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    }
 
+    .plus-button {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        border-radius: 50%;
+        background-color: #3b82f6;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        text-decoration: none;
+        font-size: 1.5rem;
+        transition: background-color 0.2s;
+    }
 
-        .plus-button {
-            display: inline-block;
-            width: 32px;
-            height: 32px;
-            line-height: 32px;
-            border-radius: 50%;
-            background-color: #3b82f6; /* Tailwind's blue-500 */
-            color: white;
-            text-align: center;
-            font-weight: bold;
-            text-decoration: none;
-            font-size: 1.5rem;
-            transition: background-color 0.2s;
-        }
+    .plus-button:hover {
+        background-color: #1e40af;
+    }
+</style>
 
-        .plus-button:hover {
-            background-color: #1e40af; /* Tailwind's blue-800 */
-        }
-    </style>
+<main class="main-content">
+    <div class="fullwidth-block greet-section">
+        <div class="container">
+            <h2 class="section-title">Welcome to Cracker!</h2>
+            <small class="section-subtitle">It may feel a bit empty, but we will have our grand opening in 2 weeks!</small>
 
-    <main class="main-content">
-        <div class="fullwidth-block greet-section">
-            <div class="container">
-                <h2 class="section-title">Welcome to Cracker!</h2>
-                <small class="section-subtitle">It may feel a bit empty, but we will have our grand opening in 2 weeks!</small>
+            <div class="max-w-4xl mx-auto p-6">
+                <h1 class="text-3xl font-bold mb-6 text-center">Today's Meals</h1>
 
-                <div class="max-w-4xl mx-auto p-6">
-                    <h1 class="text-3xl font-bold mb-6 text-center">Today's Meals</h1>
-
-                    <div class="calorie-boxes">
-                        <div class="calorie-box">
-                            <strong>Needed</strong><br>{{ needed_calories|floatformat:0 }} kcal
-                        </div>
-                        <div class="calorie-box">
-                            <strong>Eaten</strong><br>{{ day_total.calories|floatformat:0 }} kcal
-                        </div>
-                        <div class="calorie-box">
-                            <strong>Remaining</strong><br>{{ remaining_calories|floatformat:0 }} kcal
-                        </div>
+                <div class="calorie-boxes">
+                    <div class="calorie-box">
+                        <strong>Needed</strong><br>{{ needed_calories|floatformat:0 }} kcal
                     </div>
-
-                    <div class="meal-container">
-                        {% for meal, data in meal_data.items %}
-                        <div class="meal-box">
-                            <div class="meal-header">
-                                <h2 class="text-xl font-semibold capitalize">{{ meal }}</h2>
-                                <a href="{% url 'tracker:add_food_to_meal' meal %}" class="plus-button">+</a>
-                            </div>
-
-                            {% if data.foods %}
-                            <ul class="space-y-1 mb-3" style="list-style-position: inside;">
-                                {% for food in data.foods %}
-                                <li class="text-gray-700">{{ food.food.name }} (x{{ food.quantity }})</li>
-                                {% endfor %}
-                            </ul>
-                            <div class="text-sm text-gray-600">
-                                <p><strong>Calories:</strong> {{ data.total.calories|floatformat:0 }}</p>
-                            </div>
-                            {% else %}
-                            <p class="text-gray-500">No items yet.</p>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
+                    <div class="calorie-box">
+                        <strong>Eaten</strong><br>{{ day_total.calories|floatformat:0 }} kcal
                     </div>
+                    <div class="calorie-box">
+                        <strong>Remaining</strong><br>{{ remaining_calories|floatformat:0 }} kcal
+                    </div>
+                </div>
 
+                <div class="meal-container">
+                    {% for meal, data in meal_data.items %}
+                    <div class="meal-box">
+                        <div class="meal-header">
+                            <h2 class="text-xl font-semibold capitalize">{{ meal }}</h2>
+                            <a href="{% url 'tracker:add_food_to_meal' meal %}" class="plus-button">+</a>
+                        </div>
+
+                        {% if data.foods %}
+                        <ul class="space-y-1 mb-3" style="list-style-position: inside;">
+                            {% for food in data.foods %}
+                            <li class="text-gray-700">{{ food.food.name }} (x{{ food.quantity }})</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="text-sm text-gray-600">
+                            <p><strong>Calories:</strong> {{ data.total.calories|floatformat:0 }}</p>
+                        </div>
+                        {% else %}
+                        <p class="text-gray-500">No items yet.</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- YAN YANA KUTULAR -->
+                <div class="summary-row">
+                    <!-- Günlük Toplam -->
                     <div class="summary-box">
                         <h2 class="text-xl font-semibold mb-2">Total for the Day</h2>
                         <p><strong>Calories:</strong> {{ day_total.calories|floatformat:0 }}</p>
@@ -130,48 +139,63 @@
                         <p><strong>Proteins:</strong> {{ day_total.proteins|floatformat:0 }}g</p>
                         <p><strong>Fiber:</strong> {{ day_total.fiber|floatformat:0 }}g</p>
                     </div>
+
+                    <!-- Ollama Tavsiyesi -->
+                    <div class="summary-box text-center">
+                        <h2 class="text-xl font-semibold mb-2">Meal Suggestion</h2>
+                        <p id="llama-response">Loading...</p>
+                    </div>
+                </div>
+                    <div class="fullwidth-block">
+                <div class="container">
+                    <h2 class="section-title">Latest news</h2>
+                    <div class="row news-list">
+                        <div class="col-md-4">
+                            <div class="news">
+                                <figure><img src="dummy/featured-image-1.jpg" alt=""></figure>
+                                <div class="date"><img src="images/icon-calendar.png" alt="">03/09/2014</div>
+                                <h2 class="entry-title"><a href="#">Donec laoreet non nec aliquam pellentesque interdum</a></h2>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="news">
+                                <figure><img src="dummy/featured-image-2.jpg" alt=""></figure>
+                                <div class="date"><img src="images/icon-calendar.png" alt="">03/09/2014</div>
+                                <h2 class="entry-title"><a href="#">Donec laoreet non nec aliquam pellentesque interdum</a></h2>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="news">
+                                <figure><img src="dummy/featured-image-3.jpg" alt=""></figure>
+                                <div class="date"><img src="images/icon-calendar.png" alt="">03/09/2014</div>
+                                <h2 class="entry-title"><a href="#">Donec laoreet non nec aliquam pellentesque interdum</a></h2>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            </div>
         </div>
-    </main>
     </div>
+</main>
 
-
-                <div class="text-center">
-                    <p> </p>
-                </div>
-            </div> <!-- .container -->
-        </div> <!-- .fullwidth-block -->
-
-        <div class="fullwidth-block">
-            <div class="container">
-                <h2 class="section-title">Latest news</h2>
-                <div class="row news-list">
-                    <div class="col-md-4">
-                        <div class="news">
-                            <figure><img src="dummy/featured-image-1.jpg" alt=""></figure>
-                            <div class="date"><img src="images/icon-calendar.png" alt="">03/09/2014</div>
-                            <h2 class="entry-title"><a href="#">Donec laoreet non nec aliquam pellentesque interdum</a></h2>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="news">
-                            <figure><img src="dummy/featured-image-2.jpg" alt=""></figure>
-                            <div class="date"><img src="images/icon-calendar.png" alt="">03/09/2014</div>
-                            <h2 class="entry-title"><a href="#">Donec laoreet non nec aliquam pellentesque interdum</a></h2>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="news">
-                            <figure><img src="dummy/featured-image-3.jpg" alt=""></figure>
-                            <div class="date"><img src="images/icon-calendar.png" alt="">03/09/2014</div>
-                            <h2 class="entry-title"><a href="#">Donec laoreet non nec aliquam pellentesque interdum</a></h2>
-                        </div>
-                    </div>
-                </div> <!-- .row -->
-            </div> <!-- .container -->
-        </div>
-        
-    </main>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch("{% url 'llama-response' %}")
+            .then(response => response.json())
+            .then(data => {
+                const responseBox = document.getElementById("llama-response");
+                if (data.response) {
+                    responseBox.innerText = data.response;
+                } else {
+                    responseBox.innerText = data.error || "No suggestion available.";
+                }
+            })
+            .catch(error => {
+                document.getElementById("llama-response").innerText = "Error loading suggestion.";
+                console.error("Error:", error);
+            });
+    });
+</script>
 {% endblock %}
