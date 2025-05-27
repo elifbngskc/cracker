@@ -14,13 +14,15 @@
     {% endif %}
 
     {% if food_info %}
-        <h2>Nutrition Facts for {{ food_info.name|title }}:</h2>
-        <ul>
-            <li><strong>Calories:</strong> {{ food_info.calories }} kcal</li>
-            <li><strong>Carbohydrates:</strong> {{ food_info.carbohydrates }} g</li>
-            <li><strong>Fats:</strong> {{ food_info.fats }} g</li>
-            <li><strong>Proteins:</strong> {{ food_info.proteins }} g</li>
-            <li><strong>Fiber:</strong> {{ food_info.fiber }} g</li>
-        </ul>
+        <div style="margin-top: 30px;">
+            <h2>Nutrition Facts for {{ food_info.name|title }}:</h2>
+            <ul>
+                <li><strong>Calories:</strong> {{ food_info.calories }} kcal</li>
+                <li><strong>Carbohydrates:</strong> {{ food_info.carbohydrates }} g</li>
+                <li><strong>Fats:</strong> {{ food_info.fats }} g</li>
+                <li><strong>Proteins:</strong> {{ food_info.proteins }} g</li>
+                <li><strong>Fiber:</strong> {{ food_info.fiber }} g</li>
+            </ul>
+        </div>
     {% endif %}
 {% endblock %}

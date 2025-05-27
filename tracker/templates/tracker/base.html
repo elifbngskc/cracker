@@ -18,29 +18,42 @@
 
 		<!-- Fix for footer and spacing -->
 		<style>
-			html, body {
-				height: 100%;
-				margin: 0;
-				padding: 0;
-			}
+		html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
 
-			body {
-				display: flex;
-				flex-direction: column;
-				min-height: 100vh;
-			}
+		body {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+		}
 
-			#site-content {
-				flex: 1;
-				display: flex;
-				flex-direction: column;
-			}
+		#site-content {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
 
-			.main-content {
-				flex: 1;
-				margin-top: 20px; /* Space below header */
-			}
-		</style>
+		.main-content {
+			flex: 1;
+			margin-top: 20px;
+			padding-bottom: 40px; /* Added spacing before footer */
+		}
+
+		.site-footer {
+			margin-top: 20px;
+			border-top: 1px solid #ccc; /* Optional visual separator */
+		}
+
+		.top-header .container {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+	</style>
 	</head>
 
 	<body>
@@ -55,12 +68,7 @@
 								<small class="description">We count calories</small>
 					</div>
 						</a>
-					<div class="right-section pull-right">
-						<form action="#" class="search-form">
-							<input type="text" placeholder="Search...">
-							<button type="submit"><img src="images/icon-search.png" alt=""></button>
-						</form>
-					</div>
+				
 				</div>
 			</div>
 
