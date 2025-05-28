@@ -1,4 +1,32 @@
 {% extends 'tracker/base.html' %}
 {% block content %}
-  <h1>(bu htmli silip direkt footera ekleyebiliriz)en kolay şey contact infosunu verip amacımızı falan vericez feedback istiycez </h1>
+<style>
+  .about-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .about-content {
+    max-width: 800px;
+  }
+</style>
+
+  <div class="about-us-section" style="text-align: center; max-width: 800px; margin: 0 auto;">
+    <h1>About Us</h1>
+    <p>
+      We are a dedicated team of two passionate individuals on a mission to help people live healthier lives.
+      Tracker was built to make calorie tracking simple, effective, and accessible for everyone.
+    </p>
+    <p>
+      Our platform allows you to log your meals, monitor your daily intake, and stay on top of your fitness goals with ease.
+      Whether you're aiming to lose weight, maintain your current lifestyle, or simply eat healthier, Tracker is here to support you every step of the way.
+    </p>
+    <p>
+      Thank you for trusting us with your journey!
+    </p>
+  </div>
 {% endblock %}
